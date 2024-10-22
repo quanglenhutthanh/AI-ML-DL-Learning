@@ -1,2 +1,5 @@
 
 *.pth
+/data/MNIST
+Projects/Dog Breed Classifier/images.tar
+Projects/Dog Breed Classifier/lists.tar
