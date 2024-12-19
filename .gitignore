@@ -8,3 +8,7 @@ Source Code/Deep Learning/runs/mnist_experiment/events.out.tfevents.1730953334.q
 Source Code/Deep Learning/runs/mnist_experiment/events.out.tfevents.1730953694.quangs-MacBook-Air.local.4351.0
 Source Code/Deep Learning/runs/mnist_experiment/events.out.tfevents.1730959445.quangs-MacBook-Air.local.4993.0
 Projects/DL Landmark Classification/__pycache__/helpers.cpython-312.pyc
+/Projects/DL Handwritten Digit Recognition/data
+/Projects/DL Handwritten Digit Recognition/__pycache__
+*.pht
+/Projects/DL Handwritten Digit Recognition/runs/mnist_experiment

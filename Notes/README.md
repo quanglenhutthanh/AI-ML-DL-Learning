@@ -48,12 +48,16 @@ Ridge, Lasso, and Elastic Net Regression.
 ### Early Stopping
 ### Dropout
 ### Learning Rate
+### Loss Functions
+### Gradient
 ### Optimizers
 
 
 ## Convolutional Neural Network
 ## Recurrent Neural Network
 ## Generative Adversarial Networks
+### Generator
+### Disciminator
 
 # Generative AI
 

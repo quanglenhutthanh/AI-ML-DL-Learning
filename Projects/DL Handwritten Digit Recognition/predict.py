@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from torchvision import transforms
 from simple_nn import SimpleNN
+from simple_cnn import SimpleCNN
 
 transform = transforms.Compose([
     transforms.ToTensor(),
@@ -10,7 +11,7 @@ transform = transforms.Compose([
 ])
     
 def predict(model_path, image_path):
-    model = SimpleNN()
+    model = SimpleCNN()
     with open(model_path, 'rb') as f:
         state_dict = torch.load(f, weights_only=True)
     model.load_state_dict(state_dict)
@@ -29,6 +30,6 @@ def predict(model_path, image_path):
     return predicted.item()
 
 model_path = "mnist_simple_nn.pht"
-image_test = "test/test001.png"
+image_test = "test/test.png"
 predicted = predict(model_path, image_test)
 print(f"The number is {predicted}")

@@ -6,6 +6,7 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from simple_nn import SimpleNN
+from simple_cnn import SimpleCNN
 from device import get_device
 # Step 1: Load the dataset
 # transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,),(0.5,))])
@@ -33,7 +34,8 @@ test_loader = DataLoader(dataset=test_dataset, batch_size=64, shuffle=False)
 
 # Step 3: Initialize the model, loss function, and optimizer
 device = get_device()
-model = SimpleNN()
+# model = SimpleNN()
+model = SimpleCNN()
 model.to(device=device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01)
