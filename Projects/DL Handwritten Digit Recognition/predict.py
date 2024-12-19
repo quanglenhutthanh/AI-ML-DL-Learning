@@ -4,6 +4,7 @@ import torch
 from torchvision import transforms
 from simple_nn import SimpleNN
 from simple_cnn import SimpleCNN
+from view_image import view_image
 
 transform = transforms.Compose([
     transforms.ToTensor(),
@@ -21,7 +22,7 @@ def predict(model_path, image_path):
     image = Image.open(image_path).convert("L")  # Convert to grayscale
     image = image.resize((28, 28))  # Resize to 28x28 pixels
     image_tensor = transform(image).unsqueeze(0)  # Add batch and channel dimensions
-
+    view_image(image_tensor=image_tensor)
     # Predict
     with torch.no_grad():
         output = model(image_tensor)
@@ -29,7 +30,7 @@ def predict(model_path, image_path):
 
     return predicted.item()
 
-model_path = "mnist_simple_nn.pht"
+model_path = "mnist_simple_cnn.pht"
 image_test = "test/test.png"
 predicted = predict(model_path, image_test)
 print(f"The number is {predicted}")
