@@ -9,37 +9,42 @@ from simple_nn import SimpleNN
 from simple_cnn import SimpleCNN
 from device import get_device
 from view_image import view_batch_images
+from tqdm import tqdm  # Import tqdm for the progress bar
 
 
 def train(model,criterion, optimizer, epochs = 5):
     # Initialize TensorBoard writer
-    writer = SummaryWriter('runs/mnist_experiment')
+    # writer = SummaryWriter('runs/mnist_experiment')
 
     # Train the model
     
     for epoch in range(epochs):
         epoch_loss = 0
-        for batch_idx, (data, target) in enumerate(train_loader):
-            # Forward pass
-            data, target = data.to(device), target.to(device)
-            output = model(data)
-            loss = criterion(output, target)
+        with tqdm(total=len(train_loader), desc=f"Epoch {epoch+1}/{epochs}", unit="batch") as pbar:
+            for batch_idx, (data, target) in enumerate(train_loader):
+                # Forward pass
+                data, target = data.to(device), target.to(device)
+                output = model(data)
+                loss = criterion(output, target)
 
-            # Backward pass and optimization
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+                # Backward pass and optimization
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
-            epoch_loss += loss.item()
+                epoch_loss += loss.item()
+                
+                pbar.set_postfix(loss=loss.item())
+                pbar.update(1)
 
         # Log the average loss for this epoch to TensorBoard
-        avg_loss = epoch_loss / len(train_loader)
-        writer.add_scalar('Loss/train', avg_loss, epoch)
+        # avg_loss = epoch_loss / len(train_loader)
+        # writer.add_scalar('Loss/train', avg_loss, epoch)
 
         print(f'Epoch {epoch+1}/{epochs}, Loss: {loss.item():.4f}')
 
     # After training, visualize with TensorBoard
-    writer.close()
+    # writer.close()
 
 # Test the model
 def validation():
@@ -66,6 +71,7 @@ def save_model(model_save_path = "mnist_simple_nn.pht"):
 # Load the dataset
 transforms = {
     'train' : transforms.Compose([
+                transforms.RandomRotation(10),
                 transforms.RandomAffine(degrees=15, translate=(0.1, 0.1)),
                 transforms.ColorJitter(brightness=0.2, contrast=0.2),
                 transforms.ToTensor(),
@@ -83,7 +89,7 @@ train_dataset = datasets.MNIST(root=root_path, download=False, train=True, trans
 test_dataset = datasets.MNIST(root=root_path, download=True, train=False, transform=transforms['valid_test'])
 train_loader = DataLoader(dataset=train_dataset, batch_size=64, shuffle=True)
 test_loader = DataLoader(dataset=test_dataset, batch_size=64, shuffle=False)
-view_batch_images(train_loader=train_loader)
+# view_batch_images(train_loader=train_loader)
 
 # Initialize the model, loss function, and optimizer
 device = get_device()
