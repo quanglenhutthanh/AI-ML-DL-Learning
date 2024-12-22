@@ -8,7 +8,7 @@ from torch.utils.tensorboard import SummaryWriter
 from simple_nn import SimpleNN
 from simple_cnn import SimpleCNN
 from device import get_device
-from view_image import view_batch_images
+from view_image import view_batch_images, save_batch_images
 from tqdm import tqdm  # Import tqdm for the progress bar
 
 
@@ -19,6 +19,7 @@ def train(model,criterion, optimizer, epochs = 5):
     # Train the model
     
     for epoch in range(epochs):
+        model.train()
         epoch_loss = 0
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch+1}/{epochs}", unit="batch") as pbar:
             for batch_idx, (data, target) in enumerate(train_loader):
@@ -71,9 +72,6 @@ def save_model(model_save_path = "mnist_simple_nn.pht"):
 # Load the dataset
 transforms = {
     'train' : transforms.Compose([
-                transforms.RandomRotation(10),
-                transforms.RandomAffine(degrees=15, translate=(0.1, 0.1)),
-                transforms.ColorJitter(brightness=0.2, contrast=0.2),
                 transforms.ToTensor(),
                 transforms.Normalize((0.5,), (0.5,))
             ]),
@@ -91,6 +89,12 @@ train_loader = DataLoader(dataset=train_dataset, batch_size=64, shuffle=True)
 test_loader = DataLoader(dataset=test_dataset, batch_size=64, shuffle=False)
 # view_batch_images(train_loader=train_loader)
 
+# Get a batch of images
+# data_iter = iter(train_loader)
+# images, labels = next(data_iter)
+# # Save the images
+# save_batch_images(images, save_dir="output_images", prefix="mnist_image", file_format="png")
+
 # Initialize the model, loss function, and optimizer
 device = get_device()
 # model = SimpleNN()
@@ -102,4 +106,4 @@ optimizer = optim.SGD(model.parameters(), lr=0.01)
 epochs = 20
 train(model=model,criterion=criterion,optimizer=optimizer,epochs = epochs)
 validation()
-save_model("mnist_simple_cnn.pht")
+save_model("mnist_simple_nn.pht")

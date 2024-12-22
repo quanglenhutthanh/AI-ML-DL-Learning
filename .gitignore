@@ -12,3 +12,4 @@ Projects/DL Landmark Classification/__pycache__/helpers.cpython-312.pyc
 /Projects/DL Handwritten Digit Recognition/__pycache__
 *.pht
 /Projects/DL Handwritten Digit Recognition/runs/mnist_experiment
+/Projects/DL Handwritten Digit Recognition/output_images

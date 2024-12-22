@@ -4,7 +4,8 @@ import torch
 from torchvision import transforms
 from simple_nn import SimpleNN
 from simple_cnn import SimpleCNN
-from view_image import view_image
+from cnn import BestPracticeCNN
+from view_image import view_image, view_tensor_image
 
 transform = transforms.Compose([
     transforms.ToTensor(),
@@ -17,14 +18,25 @@ def predict_image(image):
         state_dict = torch.load(f, weights_only=True)
     model.load_state_dict(state_dict)
     model.eval()
+
     image = image.convert('RGBA')
     grayscale_image = Image.new("L", image.size, 255)  # Create a white background
     grayscale_image.paste(image.convert("L"), mask=image.split()[3])  # Use alpha channel as mask
     grayscale_image = grayscale_image.resize((28, 28))  # Resize to 28x28 pixels
     
     grayscale_image.save("processed_image.png")
-    image_tensor = transform(grayscale_image).unsqueeze(0)  # Add batch and channel dimensions
-    # view_image(image_tensor=image_tensor)
+
+    image_np = np.array(grayscale_image)
+    image_np = 255 - image_np  # Invert colors (MNIST has white digits on black)
+
+    # Normalize to range [0, 1]
+    image_np = image_np / 255.0
+
+    image_tensor = transform(image_np)  # Add batch and channel dimensions
+    image_tensor = image_tensor.unsqueeze(0)
+    image_tensor = image_tensor.to(torch.float32)
+
+    # image_tensor = transform(grayscale_image).unsqueeze(0)  # Add batch and channel dimensions
     
     with torch.no_grad():
         output = model(image_tensor)
@@ -47,10 +59,25 @@ def predict(model_path, image_path):
 
     # Load and preprocess the image
     image = Image.open(image_path).convert("L")  # Convert to grayscale
-    image = image.resize((28, 28))  # Resize to 28x28 pixels
-    image_tensor = transform(image).unsqueeze(0)  # Add batch and channel dimensions
-   
-    view_image(image_tensor=image_tensor)
+    view_image(image=image)
+    # Resize to 28x28
+    image = image.resize((28, 28))
+
+    # Convert to NumPy array and invert colors if needed
+    image_np = np.array(image)
+    image_np = 255 - image_np  # Invert colors (MNIST has white digits on black)
+
+    # Normalize to range [0, 1]
+    image_np = image_np / 255.0
+
+    # Convert to tensor
+    
+    image_tensor = transform(image_np)  # Add batch and channel dimensions
+    image_tensor = image_tensor.unsqueeze(0)
+    image_tensor = image_tensor.to(torch.float32)
+    # Ensure the tensor is in the correct dtype
+    
+    view_tensor_image(image_tensor=image_tensor)
     
     with torch.no_grad():
         output = model(image_tensor)
@@ -64,7 +91,7 @@ def predict(model_path, image_path):
     return class_probabilities
 
 model_path = "mnist_simple_cnn.pht"
-image_test = "test/test002.png"
+image_test = "test/processed_image.png"
 predicted = predict(model_path, image_test)
 
 print(f"The number is {predicted}")
