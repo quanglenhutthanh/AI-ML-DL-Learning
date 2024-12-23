@@ -1,7 +1,7 @@
 import gradio as gr
 from predict import predict_image
 # Custom CSS to make the label text bigger
-def greet(image_dict):
+def predict(image_dict):
     # Extract the "composite" key from the dictionary
     composite_image = image_dict["composite"]
     # composite_image.save("sketchpad_output.png")  # Save as PNG
@@ -15,7 +15,7 @@ css = """
 }
 """
 demo = gr.Interface(
-    fn=greet,
+    fn=predict,
     inputs=gr.Sketchpad(type="pil", brush=gr.Brush(default_size=20)),  # Ensure it returns a PIL image
     outputs=[gr.Label(num_top_classes=3, label="Predicted number is:", elem_classes=["big-label"])],
     css=css

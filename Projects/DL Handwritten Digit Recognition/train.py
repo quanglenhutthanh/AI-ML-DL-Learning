@@ -43,7 +43,7 @@ def train(model,criterion, optimizer, epochs = 5):
         # writer.add_scalar('Loss/train', avg_loss, epoch)
 
         print(f'Epoch {epoch+1}/{epochs}, Loss: {loss.item():.4f}')
-
+        validation()
     # After training, visualize with TensorBoard
     # writer.close()
 
@@ -71,10 +71,12 @@ def save_model(model_save_path = "mnist_simple_nn.pht"):
 
 # Load the dataset
 transforms = {
-    'train' : transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize((0.5,), (0.5,))
-            ]),
+    'train': transforms.Compose([
+        transforms.RandomRotation(10),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5,), (0.5,))  # Normalize for MNIST
+    ]),
     'valid_test' : transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize((0.5,), (0.5,))
@@ -101,7 +103,7 @@ device = get_device()
 model = SimpleCNN()
 model.to(device=device)
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 epochs = 20
 train(model=model,criterion=criterion,optimizer=optimizer,epochs = epochs)
