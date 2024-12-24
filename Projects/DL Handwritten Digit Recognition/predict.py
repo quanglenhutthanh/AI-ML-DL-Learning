@@ -1,10 +1,11 @@
+import os
 from PIL import Image
 import numpy as np
 import torch
 from torchvision import transforms
+from device import get_device
 from simple_nn import SimpleNN
 from simple_cnn import SimpleCNN
-from cnn import BestPracticeCNN
 from view_image import view_image, view_tensor_image
 
 transform = transforms.Compose([
@@ -59,7 +60,7 @@ def predict(model_path, image_path):
 
     # Load and preprocess the image
     image = Image.open(image_path).convert("L")  # Convert to grayscale
-    view_image(image=image)
+    # view_image(image=image)
     # Resize to 28x28
     image = image.resize((28, 28))
 
@@ -77,7 +78,7 @@ def predict(model_path, image_path):
     image_tensor = image_tensor.to(torch.float32)
     # Ensure the tensor is in the correct dtype
     
-    view_tensor_image(image_tensor=image_tensor)
+    # view_tensor_image(image_tensor=image_tensor)
     
     with torch.no_grad():
         output = model(image_tensor)
@@ -89,9 +90,16 @@ def predict(model_path, image_path):
     }
     # return predicted.item()
     return class_probabilities
-
-model_path = "mnist_simple_cnn.pht"
-image_test = "test/processed_image.png"
-predicted = predict(model_path, image_test)
-
-print(f"The number is {predicted}")
+if __name__ == "__main__":
+    device = get_device()
+    model_path = "trained_model/mnist_simple_cnn.pht"
+   
+    # Loop through all files in the test folder
+    test_folder = "test/"
+    for filename in os.listdir(test_folder):
+        if filename.endswith(".png"):  # Only process .png files (you can add more extensions if needed)
+            image_path = os.path.join(test_folder, filename)
+            predicted = predict(model_path = "mnist_model.pht",image_path=image_path)
+            print(F"[INFO] The predicted results of the image {image_path} are: {predicted}")
+            print()
+           

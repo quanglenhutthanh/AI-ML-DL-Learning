@@ -4,3 +4,9 @@
 
 Direct downloads from [Yann LeCun's website](https://yann.lecun.com/exdb/mnist/)
 
+In this project, We will train a neural network model based on MNIST dataset and use that model to create an application that can predict handwritten digits.
+
+We will develop two types of model: one is simple neural network consisting only of fully connected layers, and the other is a more complex model that incorporates convolutional layers (CNNs). We also use Gradio to create an user interface, that allows drawing a digit for testing the trained model.
+
+
+

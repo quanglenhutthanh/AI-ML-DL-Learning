@@ -12,12 +12,12 @@ from view_image import view_batch_images, save_batch_images
 from tqdm import tqdm  # Import tqdm for the progress bar
 
 
-def train(model,criterion, optimizer, epochs = 5):
+def train(model, device, train_loader, test_loader, criterion, optimizer, epochs = 5):
+    
     # Initialize TensorBoard writer
     # writer = SummaryWriter('runs/mnist_experiment')
 
     # Train the model
-    
     for epoch in range(epochs):
         model.train()
         epoch_loss = 0
@@ -43,17 +43,17 @@ def train(model,criterion, optimizer, epochs = 5):
         # writer.add_scalar('Loss/train', avg_loss, epoch)
 
         print(f'Epoch {epoch+1}/{epochs}, Loss: {loss.item():.4f}')
-        validation()
+        validation(model,device,test_loader)
     # After training, visualize with TensorBoard
     # writer.close()
 
 # Test the model
-def validation():
+def validation(model, device, data_loader):
     correct = 0
     total = 0
     model.eval()  # Set the model to evaluation mode
     with torch.no_grad():
-        for data, target in test_loader:
+        for data, target in data_loader:
             data, target = data.to(device), target.to(device)
             output = model(data)
             _, predicted = torch.max(output.data, 1)
@@ -64,48 +64,46 @@ def validation():
     print(f'Accuracy on test set: {accuracy:.2f}%')
 
 # Save the trained model
-def save_model(model_save_path = "mnist_simple_nn.pht"):
+def save_model(model, model_save_path):
     torch.save(model.state_dict(), model_save_path)
-    print(f'Model saved to {model_save_path}')
+    print(f'[INFO] Model saved to {model_save_path}')
 
 
-# Load the dataset
-transforms = {
-    'train': transforms.Compose([
-        transforms.RandomRotation(10),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize((0.5,), (0.5,))  # Normalize for MNIST
-    ]),
-    'valid_test' : transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize((0.5,), (0.5,))
-            ])
-}
+if __name__ == "__main__":
+    root_path = os.path.expanduser('data')
+    # Load the dataset
+    transforms = {
+        'train': transforms.Compose([
+            transforms.RandomRotation(10),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5,), (0.5,))  # Normalize for MNIST
+        ]),
+        'valid_test' : transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5,), (0.5,))
+        ])
+    }
+    train_dataset = datasets.MNIST(root=root_path, download=False, train=True, transform=transforms['train'])
+    test_dataset = datasets.MNIST(root=root_path, download=True, train=False, transform=transforms['valid_test'])
+    train_loader = DataLoader(dataset=train_dataset, batch_size=64, shuffle=True)
+    test_loader = DataLoader(dataset=test_dataset, batch_size=64, shuffle=False)
+    # view_batch_images(train_loader=train_loader)
 
-root_path = os.path.expanduser('data')
+    # Get a batch of images
+    # data_iter = iter(train_loader)
+    # images, labels = next(data_iter)
+    # Save the images
+    # save_batch_images(images, save_dir="output_images", prefix="mnist_image", file_format="png")
 
-train_dataset = datasets.MNIST(root=root_path, download=False, train=True, transform=transforms['train'])
-test_dataset = datasets.MNIST(root=root_path, download=True, train=False, transform=transforms['valid_test'])
-train_loader = DataLoader(dataset=train_dataset, batch_size=64, shuffle=True)
-test_loader = DataLoader(dataset=test_dataset, batch_size=64, shuffle=False)
-# view_batch_images(train_loader=train_loader)
+    # Initialize the model, loss function, and optimizer
+    device = get_device()
+    # model = SimpleNN()
+    model = SimpleCNN()
+    model.to(device=device)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# Get a batch of images
-# data_iter = iter(train_loader)
-# images, labels = next(data_iter)
-# # Save the images
-# save_batch_images(images, save_dir="output_images", prefix="mnist_image", file_format="png")
-
-# Initialize the model, loss function, and optimizer
-device = get_device()
-# model = SimpleNN()
-model = SimpleCNN()
-model.to(device=device)
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
-
-epochs = 20
-train(model=model,criterion=criterion,optimizer=optimizer,epochs = epochs)
-validation()
-save_model("mnist_simple_nn.pht")
+    epochs = 20
+    train(model=model,device=device,train_loader=train_loader,test_loader=test_loader,criterion=criterion,optimizer=optimizer,epochs = epochs)
+    save_model(model=model,model_save_path="mnist_model.pht")
