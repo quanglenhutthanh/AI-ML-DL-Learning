@@ -34,7 +34,7 @@ def split_list(input_list: list[str],
     return [input_list[i:i+slice_size] for i in range(0, len(input_list), slice_size)]
 
 def embedding_text(sentences):
-    embedding_model = SentenceTransformer(model_name_or_path="all-mpnet-base-v2", device="cpu")
+    embedding_model = SentenceTransformer(model_name_or_path="all-mpnet-base-v2", device="mps")
     
     embeddings = embedding_model.encode(sentences=sentences)
     
